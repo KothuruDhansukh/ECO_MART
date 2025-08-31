@@ -38,7 +38,7 @@ def get_search_query_recommendations():
         if status_code and status_code != 200:
             return resp
 
-        query = request.args.get("soap", "")
+        query = request.args.get("query", "")
         if not query:
             return jsonify({"error": "missing query"}), 400
 
