@@ -54,9 +54,30 @@ export const SearchProvider = ({ children }) => {
     if (!sort || !sort._sort) return items;
     const key = sort._sort;
     const dir = (sort._order || 'desc').toLowerCase() === 'asc' ? 1 : -1;
+
+    const gradeRank = { 'A+': 5, 'A': 4, 'B': 3, 'C': 2, 'D': 1 };
+    const getComparable = (prod) => {
+      if (!prod) return null;
+      // Handle eco/water rating grades specially
+      if (key === 'Eco_Rating' || key === 'Water_Rating') {
+        const raw = (prod[key] ?? '').toString().trim().toUpperCase();
+        const rank = gradeRank[raw];
+        return typeof rank === 'number' ? rank : null;
+      }
+      // Handle price with discount fallback
+      if (key === 'discountPrice' || key === 'price') {
+        const dp = prod.discountPrice;
+        const p = prod.price;
+        const val = Number.isFinite(dp) ? dp : Number.isFinite(p) ? p : null;
+        return typeof val === 'number' ? val : null;
+      }
+      // Default behavior: direct field
+      return prod[key] ?? null;
+    };
+
     return [...items].sort((a, b) => {
-      const va = a?.[key];
-      const vb = b?.[key];
+      const va = getComparable(a);
+      const vb = getComparable(b);
       if (va == null && vb == null) return 0;
       if (va == null) return 1;
       if (vb == null) return -1;

@@ -309,5 +309,5 @@ def search_based_recommendation(profile, query, df):
             return v.isoformat()
         return v
 
-    out_ids = matches[id_col].head(20).tolist()
+    out_ids = matches[id_col].tolist()
     return [_to_jsonable(v) for v in out_ids]
